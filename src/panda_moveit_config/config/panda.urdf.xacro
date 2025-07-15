@@ -1,44 +1,106 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="panda">
     <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
-    <xacro:arg name="ros2_control_hardware_type" default="mock_components" />
-    <xacro:property name="PI" value="3.14159274"/>
 
-    <!-- Import panda urdf file -->
+    <!-- Import panda urdf file and camera -->
     <xacro:include filename="$(find robot_description)/urdf/panda.urdf" />
     <xacro:include filename="$(find robot_description)/urdf/camera/camera.xacro"/>
 
-    <!-- Camera -->
+    <!-- Attach Camera -->
     <xacro:camera_v0 parent="panda_link0">
-	    <origin xyz="0.2 0.6 0.7" rpy="0 ${PI/2} 0"/>
+	    <origin xyz="0.2 0.6 0.7" rpy="0 1.57079637 0"/>
     </xacro:camera_v0>
     <xacro:camera_gazebo_v0/>
 
-    <!-- controllers for gazebo -->
-    <xacro:include filename="panda.gazebo_ros2_control.xacro" />
-    <xacro:panda_gazebo_ros2_control initial_positions_file="$(arg initial_positions_file)"/>
+    <!-- ################################################################## -->
+    <!-- ##########                 CORRECTED PART                 ########## -->
+    <!-- ################################################################## -->
+    <!-- This block defines the ros2_control interface directly inside the URDF. -->
+    <!-- This is the standard way for Gazebo Sim (Jazzy and newer). -->
+    <ros2_control name="GazeboSystem" type="system">
+      <hardware>
+        <plugin>gz_ros2_control/GazeboSystem</plugin>
+      </hardware>
+      <joint name="panda_joint1">
+        <command_interface name="position">
+          <param name="min">-2.8973</param>
+          <param name="max">2.8973</param>
+        </command_interface>
+        <state_interface name="position">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="panda_joint2">
+        <command_interface name="position">
+          <param name="min">-1.7628</param>
+          <param name="max">1.7628</param>
+        </command_interface>
+        <state_interface name="position">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="panda_joint3">
+        <command_interface name="position">
+          <param name="min">-2.8973</param>
+          <param name="max">2.8973</param>
+        </command_interface>
+        <state_interface name="position">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="panda_joint4">
+        <command_interface name="position">
+          <param name="min">-3.0718</param>
+          <param name="max">-0.0698</param>
+        </command_interface>
+        <state_interface name="position">
+          <param name="initial_value">-1.5708</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="panda_joint5">
+        <command_interface name="position">
+          <param name="min">-2.8973</param>
+          <param name="max">2.8973</param>
+        </command_interface>
+        <state_interface name="position">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="panda_joint6">
+        <command_interface name="position">
+          <param name="min">-0.0175</param>
+          <param name="max">3.7525</param>
+        </command_interface>
+        <state_interface name="position">
+          <param name="initial_value">1.5708</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="panda_joint7">
+        <command_interface name="position">
+          <param name="min">-2.8973</param>
+          <param name="max">2.8973</param>
+        </command_interface>
+        <state_interface name="position">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="panda_finger_joint1">
+        <command_interface name="position">
+          <param name="min">0.0</param>
+          <param name="max">0.04</param>
+        </command_interface>
+        <state_interface name="position">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+      </joint>
+    </ros2_control>
 
-    <!-- There were no gazebo files in the original file-->
-  <gazebo>
-    <plugin
-        filename="gz_ros2_control-system"
-        name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-        <parameters>$(find panda_moveit_config)/config/ros2_controllers.yaml</parameters>
-    </plugin>
-    <plugin
-        filename="gz-sim-joint-state-publisher-system"
-        name="gz::sim::systems::JointStatePublisher">
-    </plugin>
-    <plugin
-        filename="gz-sim-pose-publisher-system"
-        name="gz::sim::systems::PosePublisher">
-        <publish_link_pose>true</publish_link_pose>
-        <use_pose_vector_msg>true</use_pose_vector_msg>
-        <publish_nested_model_pose>true</publish_nested_model_pose>
-    </plugin>
-
-    <plugin filename="ignition-gazebo-sensors-system" name="ignition::gazebo::systems::Sensors">
-      <render_engine>ogre2</render_engine>
-    </plugin>
-  </gazebo>
 </robot>
